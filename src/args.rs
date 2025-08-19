@@ -3,10 +3,11 @@
 use clap::Parser;
 use std::path::PathBuf;
 
+/// BaiTTS-CLI-rs: 基于 MulitTTS API 的 TXT 转有声书命令行工具
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 pub struct Cli {
-    /// [操作模式] 列出所有可用的声音
+    /// [操作模式] 列出当前 API 所有可用的声音
     #[arg(short, long, group = "mode")]
     pub list: bool,
 
@@ -18,7 +19,7 @@ pub struct Cli {
     #[arg(short, long, value_name = "DIR_PATH", group = "mode")]
     pub dir: Option<PathBuf>,
 
-    /// [必需] 文本转语音 API 的基础 URL
+    /// [必需] MulitTTS API 的基础 URL [示例： http://127.0.0.1:8774]
     #[arg(long)]
     pub api: Option<String>,
 
@@ -42,7 +43,7 @@ pub struct Cli {
     #[arg(long, value_parser = clap::value_parser!(u8).range(0..=100))]
     pub pitch: Option<u8>,
 
-    /// [可选] 生成 LRC 歌词文件，并指定每行最大字符数
+    /// [可选] 生成 LRC 歌词文件，并设置每行最大字符数
     #[arg(short, long, value_name = "CHARS_PER_LINE", num_args(0..=1), default_missing_value="15", value_parser = parse_sub_range)]
     pub sub: Option<usize>,
 
