@@ -3,7 +3,7 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 [![Rust](https://img.shields.io/badge/rust-1.89.0-orange.svg)](https://www.rust-lang.org/)
 
-一个基于 [MulitTTS](https://github.com/jianchang512/Mqtt-X) API 的命令行工具，用于将文本文档（.txt）转换为有声书（.wav），并可选择生成同步的 LRC 歌词文件。使用 Python 开发的同款工具  [BaiTTS-CLI (已停止维护)](https://github.com/koreader/koreader/releases) 
+一个基于 [MulitTTS](https://t.me/MultiTTS) API 的命令行工具，用于将文本文档（.txt）转换为有声书（.wav），并可选择生成同步的 LRC 歌词文件。使用 Python 开发的同款工具  [BaiTTS-CLI (已停止维护)](https://github.com/Doraemonsan/BaiTTS-CLI) 
 
 ## ✨ 功能特性
 
