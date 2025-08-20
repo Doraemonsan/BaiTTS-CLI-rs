@@ -36,7 +36,7 @@ pub fn process_file(
         last_line.push_str("[[PAUSE:1000]]");
     }
 
-    let temp_dir = Builder::new().prefix("baitts").tempdir()?;
+    let temp_dir = Builder::new().prefix("baitts-").tempdir()?;
     let mut audio_chunks = Vec::new();
     let mut durations = Vec::new();
     let mut original_lines_for_lrc = Vec::new();
