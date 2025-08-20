@@ -11,8 +11,7 @@ use clap::Parser;
 use std::io;
 use std::path::Path;
 
-#[tokio::main]
-async fn main() -> Result<()> {
+fn main() -> Result<()> {
     let args = args::Cli::parse();
 
     validate_args(&args)?;
@@ -38,7 +37,7 @@ async fn main() -> Result<()> {
         let api_url = args.api.as_ref().unwrap();
         let client = api::ApiClient::new(api_url.clone())?;
         let blacklist = match &args.blacklist {
-            Some(source) => Some(utils::load_blacklist(source).await?),
+            Some(source) => Some(utils::load_blacklist(source)?),
             None => None,
         };
 
@@ -66,7 +65,7 @@ async fn main() -> Result<()> {
         let api_url = args.api.as_ref().unwrap();
         let client = api::ApiClient::new(api_url.clone())?;
         let blacklist = match &args.blacklist {
-            Some(source) => Some(utils::load_blacklist(source).await?),
+            Some(source) => Some(utils::load_blacklist(source)?),
             None => None,
         };
         process::process_directory(dir_path, &args, &client, &blacklist)?;

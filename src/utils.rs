@@ -10,13 +10,11 @@ lazy_static::lazy_static! {
     pub static ref LRC_TAG_REGEX: Regex = Regex::new(r"\[\[.*?\]\]").unwrap();
 }
 
-pub async fn load_blacklist(source: &str) -> Result<Regex> {
+pub fn load_blacklist(source: &str) -> Result<Regex> {
     let content = if source.starts_with("http://") || source.starts_with("https://") {
-        reqwest::get(source)
-            .await
+        reqwest::blocking::get(source)
             .context("无法获取远程黑名单文件")?
             .text()
-            .await
             .context("无法读取远程黑名单内容")?
     } else if Path::new(source).exists() {
         fs::read_to_string(source).context("无法读取本地黑名单文件")?

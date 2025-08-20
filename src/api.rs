@@ -41,7 +41,7 @@ pub struct ApiClient {
 impl ApiClient {
     pub fn new(base_url: String) -> Result<Self> {
         let client = Client::builder()
-            .timeout(Duration::from_secs(60))
+            .timeout(Duration::from_secs(15))
             .build()
             .context("无法创建 HTTP 客户端")?;
         Ok(Self { client, base_url })
@@ -120,8 +120,9 @@ impl ApiClient {
         if let Some(v) = speed { url.query_pairs_mut().append_pair("speed", &v.to_string()); }
         if let Some(v) = pitch { url.query_pairs_mut().append_pair("pitch", &v.to_string()); }
 
+        let request_url = url.to_string();
         let response = self.send_request_with_retry(|| {
-            self.client.get(url.as_str()).build()
+            self.client.get(&request_url).build()
         })?;
 
         let bytes = response.bytes().context("读取音频响应体失败")?.to_vec();
