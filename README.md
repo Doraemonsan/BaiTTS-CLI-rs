@@ -3,7 +3,7 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 [![Rust](https://img.shields.io/badge/rust-1.89.0-orange.svg)](https://www.rust-lang.org/)
 
-一个基于 [MulitTTS](https://t.me/MultiTTS) API 的命令行工具，用于将文本文档（.txt）转换为有声书（.wav），并可选择生成同步的 LRC 歌词文件。使用 Python 开发的同款工具  [BaiTTS-CLI (已停止维护)](https://github.com/Doraemonsan/BaiTTS-CLI) 
+一个基于 [MulitTTS](https://t.me/MultiTTS) API 的命令行工具，用于将文本文档（.txt）转换为有声书音频（.wav），并可选择生成同步的 LRC 歌词文件。使用 Python 开发的同款工具  [BaiTTS-CLI (已停止维护)](https://github.com/Doraemonsan/BaiTTS-CLI) 
 
 ## ✨ 功能特性
 
@@ -22,7 +22,9 @@
 ```Shell
 # 安装 rustup (如果尚未安装)
 pacman -Sy rustup
+# 安装最新的稳定版 rust 开发环境
 rustup install stable
+# 设置稳定版为默认环境
 rustup default stable
 ```
 
