@@ -1,9 +1,9 @@
-# BaiTTS-CLI-rs
+、# BaiTTS-CLI-rs
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 [![Rust](https://img.shields.io/badge/rust-1.89.0-orange.svg)](https://www.rust-lang.org/)
 
-一个基于 [MulitTTS](https://t.me/MultiTTS) API 的命令行工具，用于将文本文档（.txt）转换为有声书音频（.wav），并可选择生成同步的 LRC 歌词文件。使用 Python 开发的同款工具  [BaiTTS-CLI (已停止维护)](https://github.com/Doraemonsan/BaiTTS-CLI) 
+一个基于 [MultiTTS](https://t.me/MultiTTS) API 的命令行工具，用于将文本文档（.txt）转换为有声书音频（.wav），并可选择生成同步的 LRC 歌词文件。使用 Python 开发的同款工具  [BaiTTS-CLI (已停止维护)](https://github.com/Doraemonsan/BaiTTS-CLI) 
 
 ## ✨ 功能特性
 
@@ -47,7 +47,7 @@ cargo build --release
 
 ## 🚀 使用方法
 
-**重要提示**: 所有操作都需要通过 `--api` 参数指定 `MulitTTS` 服务的 URL。
+**重要提示**: 所有操作都需要通过 `--api` 参数指定 `MultiTTS` 服务的 URL。
 
 ### 1. 查看可用的声音列表
 
@@ -96,7 +96,7 @@ baitts-cli-rs \
 | `--list`            | `-l`         | 列出当前 API 所有可用的声音。                                | -        |
 | `--file <PATH>`     | `-f <PATH>`  | 指定要处理的单个 `.txt` 文件。                               | -        |
 | `--dir <PATH>`      | `-d <PATH>`  | 指定要处理的包含多个 `.txt` 文件的目录。                     | -        |
-| `--api <URL>`       |              | **[必需]** MulitTTS API 的基础 URL。                         | -        |
+| `--api <URL>`       |              | **[必需]** MultiTTS API 的基础 URL。                         | -        |
 | `--out <DIR>`       | `-o <DIR>`   | 指定输出目录。                                               | `output` |
 | `--voice <ID>`      |              | 指定要使用的声音 ID。                                        | API 默认 |
 | `--volume <0-100>`  |              | 指定音量。                                                   | API 默认 |

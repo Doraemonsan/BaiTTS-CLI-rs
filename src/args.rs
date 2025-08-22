@@ -3,7 +3,7 @@
 use clap::Parser;
 use std::path::PathBuf;
 
-/// BaiTTS-CLI-rs: 基于 MulitTTS API 的 TXT 转有声书命令行工具
+/// BaiTTS-CLI-rs: 基于 MultiTTS API 的 TXT 转有声书命令行工具
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 pub struct Cli {
@@ -19,7 +19,7 @@ pub struct Cli {
     #[arg(short, long, value_name = "DIR_PATH", group = "mode")]
     pub dir: Option<PathBuf>,
 
-    /// [必需] MulitTTS API 的基础 URL [示例： http://127.0.0.1:8774]
+    /// [必需] MultiTTS API 的基础 URL [示例： http://127.0.0.1:8774]
     #[arg(long)]
     pub api: Option<String>,
 
