@@ -1,6 +1,6 @@
 [package]
 name = "baitts-cli-rs"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2024"
 
 [dependencies]
@@ -17,4 +17,4 @@ indicatif = "0.17"
 chardet = "0.2"
 encoding_rs = "0.8"
 url = "2.5"
-lazy_static = "1.4.0"
+once_cell = "1.18"

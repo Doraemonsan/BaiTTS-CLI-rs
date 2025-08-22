@@ -5,10 +5,11 @@ use regex::{Regex, RegexBuilder};
 use std::fs::{self, File};
 use std::io::Read;
 use std::path::{Path, PathBuf};
+use once_cell::sync::Lazy;
 
-lazy_static::lazy_static! {
-    pub static ref LRC_TAG_REGEX: Regex = Regex::new(r"\[\[.*?\]\]").unwrap();
-}
+pub static LRC_TAG_REGEX: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r"\[\[.*?\]\]").unwrap()
+});
 
 pub fn load_blacklist(source: &str) -> Result<Regex> {
     let content = if source.starts_with("http://") || source.starts_with("https://") {
