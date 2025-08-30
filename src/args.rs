@@ -60,6 +60,6 @@ fn parse_sub_range(s: &str) -> Result<usize, String> {
     if (10..=100).contains(&value) {
         Ok(value)
     } else {
-        Err(format!("LRC 歌词字符数必须在 10 到 100 之间"))
+        Err("LRC 歌词字符数必须在 10 到 100 之间".to_string())
     }
 }

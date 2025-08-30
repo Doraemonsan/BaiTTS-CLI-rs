@@ -94,8 +94,8 @@ fn validate_args(args: &args::Cli) -> Result<()> {
         if let Some(file) = &args.file {
             if !Path::new(file).exists() { return Err(anyhow!("文件不存在: {:?}", file)); }
         }
-        if let Some(dir) = &args.dir {
-            if !Path::new(dir).is_dir() { return Err(anyhow!("目录不存在: {:?}", dir)); }
+        if let Some(file) = &args.file && !Path::new(file).exists() { 
+            return Err(anyhow!("文件不存在: {:?}", file)); 
         }
     }
     

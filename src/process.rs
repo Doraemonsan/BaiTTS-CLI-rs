@@ -105,7 +105,7 @@ pub fn process_directory(
     let mut entries: Vec<PathBuf> = fs::read_dir(dir_path)?
         .filter_map(|res| res.ok())
         .map(|e| e.path())
-        .filter(|p| p.is_file() && p.extension().map_or(false, |ext| ext == "txt"))
+        .filter(|p| p.is_file() && p.extension().is_some_and(|ext| ext == "txt"))
         .collect();
     
     entries.sort();
