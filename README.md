@@ -14,10 +14,19 @@
 - **黑名单词汇**: 支持通过本地文件或 URL 加载黑名单词库，以跳过特定词语的发音。
 
 ## ⚙️ 安装
+安装方法二选一即可，推荐直接使用预构建的二进制文件，如果预构建的二进制文件不能满足你的运行平台，则建议自行编译安装。
 
-### 1. 环境准备
+### 1. 使用预构建二进制文件
+根据你的系统下载最新的预构建二进制文件 [https://github.com/Doraemonsan/BaiTTS-CLI-rs/releases](https://github.com/Doraemonsan/BaiTTS-CLI-rs/releases) ，解压并赋予可执行权限直接执行，或者拷贝到你的系统路径 (如 `/usr/local/bin` ）下以全局使用
 
-首先，你需要安装 Rust 环境。推荐使用 `rustup` 进行安装。本项目在 `rustc 1.89.0` 版本下开发和测试，建议使用 `rustc` 版本不低于本项目开发环境
+预构建的二进制文件现已支持:
+  + Linux (glibc-x64, glibc-Arm64)
+  + Windows (x64)
+  + MacOS 15+ (Arm64)
+
+### 2. 编译安装
+
+首先，你需要安装 Rust 开发环境。推荐使用 `rustup` 进行安装。本项目在 `rustc 1.89.0` 版本下进行开发和测试，建议使用的 `rustc` 版本不低于本项目开发环境
 
 ```Shell
 # 安装 rustup (如果尚未安装)
@@ -28,16 +37,17 @@ rustup install stable
 rustup default stable
 ```
 
-### 2. 编译安装
+使用源码进行构建
 
-```
+```Shell
 # 1. 克隆本仓库
-git clone https://github.com/your-username/BaiTTS-CLI-rs
+git clone https://github.com/Doraemonsan/BaiTTS-CLI-rs
 
 # 2. 进入项目目录
 cd BaiTTS-CLI-rs
 
-# 3. 使用 Cargo 进行编译
+# 3. 使用 Cargo 进行编译，如需交叉编译请自行安装对应平台工具链
+# 使用 --target 来生成目标平台的二进制文件(如 --target x86_64-pc-windows-gnu)
 cargo build --release
 
 # 编译后的可执行文件位于 ./target/release/baitts-cli-rs
