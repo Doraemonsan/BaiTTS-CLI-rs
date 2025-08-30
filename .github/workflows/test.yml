@@ -1,0 +1,61 @@
+name: Rust Test
+
+# 触发条件：
+# 1. 推送到 main 分支
+# 2. 向 main 分支发起 Pull Request
+# 3. 推送任何 'v*' 格式的 tag (例如 v0.1.0, v1.2.3)
+on:
+  push:
+    branches: [ "main" ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ "main" ]
+
+# 测试目标平台 
+jobs:
+  test:
+    name: Test on ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          # x86 平台的64位 Linux 系统
+          - os: ubuntu-latest
+            platform: x86_64-unknown-linux-gnu
+          # x86 平台的64位 Windows 系统
+          - os: windows-latest
+            platform: x86_64-pc-windows-msvc
+          # Arm 平台的64位 Linux 系统
+          - os: ubuntu-latest
+            platform: aarch64-unknown-linux-gnu
+          # Arm 平台的64位 MacOS 系统
+          - os: macos-latest
+            platform: aarch64-apple-darwin
+
+    steps:
+      # 步骤1: 检出代码
+      - name: Checkout code
+        uses: actions/checkout@v4
+      # 步骤2: 安装 Rust 工具链
+      - name: Install Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.platform }}
+      # 步骤3: 设置 Cargo 缓存，加速后续构建
+      - name: Cache Cargo dependencies
+        uses: Swatinem/rust-cache@v2
+
+      # 步骤4: 运行代码静态分析 (Clippy)
+      # 使用 -D warnings 参数将所有警告视为错误，保证代码质量
+      - name: Run Clippy
+        run: cargo clippy -- -D warnings
+
+      # 步骤5: 检查代码格式
+      - name: Check formatting
+        run: cargo fmt -- --check
+
+      # 步骤6: 运行测试
+      - name: Run tests
+        run: cargo test --verbose

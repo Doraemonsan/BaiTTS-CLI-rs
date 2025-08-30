@@ -1,0 +1,141 @@
+name: Create and Publish Release
+
+# 触发条件：仅在推送 'v*' 开头的 tag 时触发
+on:
+  push:
+    tags:
+      - 'v*'
+
+# 设置环境变量
+env:
+  # 项目名称
+  PROJECT_NAME: baitts-cli-rs
+
+jobs:
+  # 为目标平台构建二进制文件
+  build_binaries:
+    name: Build Binaries
+    # 使用策略矩阵为多个平台并行构建
+    strategy:
+      matrix:
+        include:
+          # x86 平台的64位 Linux 系统
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            shorthand: linux-amd64
+          # x86 平台的64位 Windows 系统
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            shorthand: windows-amd64
+          # Arm 平台的64位 Linux 系统
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+            shorthand: linux-arm64
+            use_cross: true # 标记此平台需要使用 cross-rs
+          # Arm 平台的64位 MacOS 系统
+          - target: aarch64-apple-darwin
+            os: macos-latest
+            shorthand: macos-arm64
+
+    # 多平台共同执行步骤
+    runs-on: ${{ matrix.os }}
+    steps:
+      # 步骤1: 检出代码
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 步骤2: 安装 Rust 工具链，并添加目标平台支持
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          targets: ${{ matrix.target }}
+
+      # 步骤3: (可选) 如果需要，安装 cross-rs 用于交叉编译
+      - name: Install cross-rs
+        if: matrix.use_cross
+        uses: taiki-e/install-action@cross
+
+      # 步骤4: (优化) 设置 Cargo 缓存，加速构建
+      - name: Cache Cargo dependencies
+        uses: Swatinem/rust-cache@v2
+
+      # 步骤5: 构建二进制文件
+      - name: Build binary
+        run: |
+          if [ "${{ matrix.use_cross }}" = "true" ]; then
+            cross build --release --target ${{ matrix.target }}
+          else
+            cargo build --release --target ${{ matrix.target }}
+          fi
+        shell: bash
+
+      # 步骤6: 准备用于打包的文件
+      - name: Prepare package
+        shell: bash
+        run: |
+          # 定义二进制文件路径和名称
+          BINARY_PATH="target/${{ matrix.target }}/release/${{ env.PROJECT_NAME }}"
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            BINARY_PATH+=".exe"
+          fi
+
+          # 创建一个临时目录用于打包
+          mkdir staging
+
+          # 将二进制文件复制到临时目录
+          cp "$BINARY_PATH" staging/
+
+      # 步骤7: 打包文件
+      - name: Package file
+        shell: bash
+        run: |
+          # 从 git ref 中获取 tag 名称 (例如 v0.1.0)
+          TAG_NAME=${{ github.ref_name }}
+          # 组合最终的压缩包名称
+          ASSET_NAME="${{ env.PROJECT_NAME }}-${{ matrix.shorthand }}-${TAG_NAME}"
+
+          # 根据操作系统选择不同的打包方式
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            # Windows 使用 zip
+            7z a "${ASSET_NAME}.zip" ./staging/*
+            echo "ASSET_PATH=${ASSET_NAME}.zip" >> $GITHUB_ENV
+          else
+            # 其他系统使用 tar.gz
+            tar -czf "${ASSET_NAME}.tar.gz" -C staging .
+            echo "ASSET_PATH=${ASSET_NAME}.tar.gz" >> $GITHUB_ENV
+          fi
+
+      # 步骤8: 上传打包好的文件作为构建产物
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.shorthand }}-artifact
+          path: ${{ env.ASSET_PATH }}
+
+  # 创建 GitHub Release 并上传所有附件
+  publish_release:
+    name: Publish Release
+    # 依赖 build_binaries ，确保所有平台都构建完成后再执行
+    needs: build_binaries
+    runs-on: ubuntu-latest
+    # 明确为该作业授予写入仓库内容的权
+    permissions:
+      contents: write
+
+    steps:
+      # 步骤1: 下载所有由 build_binaries 作业上传的构建产物
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          # 将所有产物下载到这个目录下
+          path: release-assets
+
+      # 步骤2: 创建 Release 并上传所有文件
+      - name: Create Release and Upload Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          # 从下载的产物中查找所有压缩包进行上传
+          files: release-assets/*/*
+          # 自动根据本次发布的 commit 历史生成 Release Notes
+          generate_release_notes: true
