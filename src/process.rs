@@ -4,7 +4,7 @@ use crate::api::ApiClient;
 use crate::args::Cli;
 use crate::lrc;
 use crate::utils;
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result, anyhow};
 use hound::{WavReader, WavWriter};
 use indicatif::{ProgressBar, ProgressStyle};
 use regex::Regex;
@@ -22,8 +22,8 @@ pub fn process_file(
 ) -> Result<()> {
     println!("正在处理文件: {:?}", file_path);
 
-    let content = fs::read_to_string(file_path)
-        .context(format!("无法读取文件内容: {:?}", file_path))?;
+    let content =
+        fs::read_to_string(file_path).context(format!("无法读取文件内容: {:?}", file_path))?;
     let mut lines: Vec<String> = content.lines().map(String::from).collect();
 
     if lines.is_empty() {
@@ -42,9 +42,13 @@ pub fn process_file(
     let mut original_lines_for_lrc = Vec::new();
 
     let pb = ProgressBar::new(lines.len() as u64);
-    pb.set_style(ProgressStyle::default_bar()
-        .template("{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} ({eta})")?
-        .progress_chars("#>-"));
+    pb.set_style(
+        ProgressStyle::default_bar()
+            .template(
+                "{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} ({eta})",
+            )?
+            .progress_chars("#>-"),
+    );
 
     for (i, line) in lines.iter().enumerate() {
         if line.trim().is_empty() {
@@ -72,7 +76,7 @@ pub fn process_file(
         let reader = WavReader::new(BufReader::new(File::open(&chunk_path)?))?;
         let duration_ms = (reader.len() as f64 / reader.spec().sample_rate as f64) * 1000.0;
         durations.push(Duration::from_millis(duration_ms as u64));
-        
+
         audio_chunks.push(chunk_path);
         if args.sub.is_some() {
             original_lines_for_lrc.push(line.clone());
@@ -83,14 +87,19 @@ pub fn process_file(
 
     let output_filename = file_path.file_stem().unwrap().to_str().unwrap();
     let output_path = args.out.join(format!("{}.wav", output_filename));
-    
+
     fs::create_dir_all(&args.out).context("创建输出目录失败")?;
-    
+
     combine_wav_files(&audio_chunks, &output_path)?;
     println!("成功合成音频文件: {:?}", output_path);
 
     if let Some(chars_per_line) = args.sub {
-        lrc::generate_lrc(&output_path, &original_lines_for_lrc, &durations, chars_per_line)?;
+        lrc::generate_lrc(
+            &output_path,
+            &original_lines_for_lrc,
+            &durations,
+            chars_per_line,
+        )?;
     }
 
     Ok(())
@@ -107,7 +116,7 @@ pub fn process_directory(
         .map(|e| e.path())
         .filter(|p| p.is_file() && p.extension().is_some_and(|ext| ext == "txt"))
         .collect();
-    
+
     entries.sort();
 
     if entries.is_empty() {
@@ -152,7 +161,7 @@ pub fn process_directory(
         process_file(&entry, args, client, blacklist)?;
         println!("--------------------------------------------------");
     }
-    
+
     println!("所有文件处理完毕。");
     Ok(())
 }
@@ -170,7 +179,10 @@ fn combine_wav_files(files: &[PathBuf], output_path: &Path) -> Result<()> {
     for file in files {
         let mut reader = WavReader::open(file)?;
         if reader.spec() != spec {
-            eprintln!("警告: 文件 {:?} 的 WAV 格式与第一个文件不同，跳过合并。", file);
+            eprintln!(
+                "警告: 文件 {:?} 的 WAV 格式与第一个文件不同，跳过合并。",
+                file
+            );
             continue;
         }
         let samples = reader.samples::<i16>().collect::<Result<Vec<_>, _>>()?;

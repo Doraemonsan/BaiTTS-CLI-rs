@@ -1,6 +1,6 @@
 // src/api.rs
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result, anyhow};
 use reqwest::blocking::Client;
 use serde::Deserialize;
 use std::collections::HashMap;
@@ -59,10 +59,7 @@ impl ApiClient {
                     if response.status().is_success() {
                         return Ok(response);
                     } else {
-                        last_error = Some(anyhow!(
-                            "API 请求失败，状态码: {}",
-                            response.status()
-                        ));
+                        last_error = Some(anyhow!("API 请求失败，状态码: {}", response.status()));
                     }
                 }
                 Err(e) => {
@@ -80,10 +77,8 @@ impl ApiClient {
 
     pub fn list_voices(&self) -> Result<Vec<Voice>> {
         let url = format!("{}/voices", self.base_url);
-        
-        let response = self.send_request_with_retry(|| {
-            self.client.get(&url).build()
-        })?;
+
+        let response = self.send_request_with_retry(|| self.client.get(&url).build())?;
 
         let parsed_response = response
             .json::<VoicesResponse>()
@@ -113,17 +108,23 @@ impl ApiClient {
     ) -> Result<Vec<u8>> {
         let mut url = url::Url::parse(&format!("{}/forward", self.base_url))
             .context("无法解析 /forward API 地址")?;
-        
+
         url.query_pairs_mut().append_pair("text", text);
-        if let Some(v) = voice { url.query_pairs_mut().append_pair("voice", v); }
-        if let Some(v) = volume { url.query_pairs_mut().append_pair("volume", &v.to_string()); }
-        if let Some(v) = speed { url.query_pairs_mut().append_pair("speed", &v.to_string()); }
-        if let Some(v) = pitch { url.query_pairs_mut().append_pair("pitch", &v.to_string()); }
+        if let Some(v) = voice {
+            url.query_pairs_mut().append_pair("voice", v);
+        }
+        if let Some(v) = volume {
+            url.query_pairs_mut().append_pair("volume", &v.to_string());
+        }
+        if let Some(v) = speed {
+            url.query_pairs_mut().append_pair("speed", &v.to_string());
+        }
+        if let Some(v) = pitch {
+            url.query_pairs_mut().append_pair("pitch", &v.to_string());
+        }
 
         let request_url = url.to_string();
-        let response = self.send_request_with_retry(|| {
-            self.client.get(&request_url).build()
-        })?;
+        let response = self.send_request_with_retry(|| self.client.get(&request_url).build())?;
 
         let bytes = response.bytes().context("读取音频响应体失败")?.to_vec();
         Ok(bytes)

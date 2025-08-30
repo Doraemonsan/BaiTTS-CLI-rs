@@ -1,15 +1,13 @@
 // src/utils.rs
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result, anyhow};
+use once_cell::sync::Lazy;
 use regex::{Regex, RegexBuilder};
 use std::fs::{self, File};
 use std::io::Read;
 use std::path::{Path, PathBuf};
-use once_cell::sync::Lazy;
 
-pub static LRC_TAG_REGEX: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r"\[\[.*?\]\]").unwrap()
-});
+pub static LRC_TAG_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"\[\[.*?\]\]").unwrap());
 
 pub fn load_blacklist(source: &str) -> Result<Regex> {
     let content = if source.starts_with("http://") || source.starts_with("https://") {
@@ -42,9 +40,7 @@ pub fn load_blacklist(source: &str) -> Result<Regex> {
 }
 
 pub fn apply_blacklist(text: &str, blacklist_regex: &Regex) -> String {
-    blacklist_regex
-        .replace_all(text, "[[$0]]")
-        .to_string()
+    blacklist_regex.replace_all(text, "[[$0]]").to_string()
 }
 
 /// 存储需要进行编码转换的文件信息
@@ -65,8 +61,7 @@ pub fn pre_scan_for_encoding_issues(paths: &[PathBuf]) -> Result<Vec<EncodingInf
     let mut issues = Vec::new();
 
     for path in paths {
-        let file = File::open(path)
-            .context(format!("预扫描时无法打开文件: {:?}", path))?;
+        let file = File::open(path).context(format!("预扫描时无法打开文件: {:?}", path))?;
 
         // 读取文件的前 8KB
         let mut buffer = Vec::new();
@@ -100,21 +95,24 @@ pub fn pre_scan_for_encoding_issues(paths: &[PathBuf]) -> Result<Vec<EncodingInf
 pub fn convert_files_to_utf8(files_to_convert: &[EncodingInfo]) -> Result<()> {
     for info in files_to_convert {
         println!("正在转换文件: {:?}...", info.path);
-        
-        let bytes = fs::read(&info.path)
-            .context(format!("无法读取文件以进行转换: {:?}", info.path))?;
+
+        let bytes =
+            fs::read(&info.path).context(format!("无法读取文件以进行转换: {:?}", info.path))?;
 
         let (decoded, _, had_errors) = encoding_rs::Encoding::for_label(info.encoding.as_bytes())
             .unwrap_or(encoding_rs::WINDOWS_1252)
             .decode(&bytes);
 
         if had_errors {
-            eprintln!("警告: 文件 {:?} 在转换为 UTF-8 时可能存在解码错误。", info.path);
+            eprintln!(
+                "警告: 文件 {:?} 在转换为 UTF-8 时可能存在解码错误。",
+                info.path
+            );
         }
 
         fs::write(&info.path, decoded.as_bytes())
             .context(format!("无法将 UTF-8 内容写入文件: {:?}", info.path))?;
-        
+
         println!("文件 {:?} 已成功转换为 UTF-8 编码。", info.path);
     }
     Ok(())
