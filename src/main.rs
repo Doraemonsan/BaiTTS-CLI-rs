@@ -99,15 +99,15 @@ fn validate_args(args: &args::Cli) -> Result<()> {
         if args.api.is_none() {
             return Err(anyhow!("使用 --file 或 --dir 时，必须提供 --api 参数。"));
         }
-        if let Some(file) = &args.file {
-            if !Path::new(file).exists() {
-                return Err(anyhow!("文件不存在: {:?}", file));
-            }
-        }
         if let Some(file) = &args.file
             && !Path::new(file).exists()
         {
             return Err(anyhow!("文件不存在: {:?}", file));
+        }
+        if let Some(dir) = &args.dir
+            && !Path::new(dir).is_dir()
+        {
+            return Err(anyhow!("目录不存在: {:?}", dir));
         }
     }
 
